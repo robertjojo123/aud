@@ -1,0 +1,25 @@
+local speaker = peripheral.find("speaker")
+if not speaker then error("No speaker attached") end
+
+local url = "https://files.catbox.moe/xfh8py.pcm"
+
+-- Download PCM data
+print("Downloading audio...")
+local response = http.get(url)
+if not response then error("Failed to download PCM file.") end
+local audioData = response.readAll()
+response.close()
+
+print("Playing audio...")
+
+-- Stream audio in chunks
+local chunkSize = 512  -- Recommended size for speaker.playAudio
+local i = 1
+while i <= #audioData do
+    local chunk = audioData:sub(i, i + chunkSize - 1)
+    speaker.playAudio(chunk)
+    i = i + chunkSize
+    os.sleep(0.05) -- Adjust timing based on your chunk size and sample rate
+end
+
+print("Done playing.")
